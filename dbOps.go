@@ -4,8 +4,8 @@ import (
 	"database/sql"
 )
 
-func createProductTable(db *sql.DB) (sql.Result, error){
-	sql := `CREATE TABLE IF NOT EXISTS product (
+func createProductsTable(db *sql.DB) (sql.Result, error){
+	sql := `CREATE TABLE IF NOT EXISTS products (
 		id INTEGER PRIMARY KEY,
 		name TEXT,
 		production_time REAL
@@ -13,16 +13,16 @@ func createProductTable(db *sql.DB) (sql.Result, error){
 	return db.Exec(sql)
 }
 
-func createMachineTable(db *sql.DB) (sql.Result, error){
+func createMachinesTable(db *sql.DB) (sql.Result, error){
 	sql := `CREATE TABLE IF NOT EXISTS machines (
 		id INTEGER PRIMARY KEY,
 		name TEXT,
 		crafting_speed REAL,
 		polution REAL,
-		module_slots INTEGER,
-		quality_coefficient_a REAL,
-		quality_coefficient_b REAL,
-		quality5_modifier REAL,
+		module_slot INTEGER,
+		q_coef_a REAL,
+		q_coef_b REAL,
+		q5_mod REAL,
 		drain REAL,
 		energy_consumption REAL
 	);`
@@ -30,7 +30,7 @@ func createMachineTable(db *sql.DB) (sql.Result, error){
 }
 // parent = product produced
 //child = product requred
-func createProductBomTable(db *sql.DB) (sql.Result, error){
+func createBomTable(db *sql.DB) (sql.Result, error){
 	sql := `CREATE TABLE IF NOT EXISTS BOM (
 		parent_id INTEGER NOT NULL,
 		parent_quantity INTEGER,
@@ -40,4 +40,50 @@ func createProductBomTable(db *sql.DB) (sql.Result, error){
 		byproduct_quantity INTEGER
 		);`
 	return db.Exec(sql)
+}
+
+func insertProduct(db *sql.DB, Product *Product) (int64, error){
+	sql :=`INSERT INTO products (
+		name,
+		production_time)
+		VALUES (?,?);`
+
+	result, err :=db.Exec(sql,
+		Product.name,
+		Product.production_time)
+
+	if err !=nil{
+		return 0,err
+	}
+	return result.LastInsertId()
+}
+
+func insertMachine(db *sql.DB, Machine *Machine) (int64, error){
+	sql :=`INSERT INTO machines (
+		name,
+		crafting_speed,
+		polution,
+		module_slot,
+		q_coef_a,
+		q_coef_b,
+		q5_mod,
+		drain,
+		energy_consumption)
+		VALUES (?,?,?,?,?,?,?,?,?);`
+
+	result, err :=db.Exec(sql,
+		Machine.name,
+		Machine.crafting_speed,
+		Machine.polution,
+		Machine.module_slot,
+		Machine.q_coef_a,
+		Machine.q_coef_b,
+		Machine.q5_mod,
+		Machine.drain,
+		Machine.energy_consumption)
+
+	if err !=nil{
+		return 0,err
+	}
+	return result.LastInsertId()
 }
