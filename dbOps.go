@@ -14,7 +14,7 @@ func createProductTable(db *sql.DB) (sql.Result, error){
 }
 
 func createMachineTable(db *sql.DB) (sql.Result, error){
-	sql := `CREATE TABLE IF NOT EXISTS product (
+	sql := `CREATE TABLE IF NOT EXISTS machines (
 		id INTEGER PRIMARY KEY,
 		name TEXT,
 		crafting_speed REAL,
@@ -31,7 +31,7 @@ func createMachineTable(db *sql.DB) (sql.Result, error){
 // parent = product produced
 //child = product requred
 func createProductBomTable(db *sql.DB) (sql.Result, error){
-	sql := `CREATE TABLE IF NOT EXISTS product (
+	sql := `CREATE TABLE IF NOT EXISTS BOM (
 		parent_id INTEGER NOT NULL,
 		parent_quantity INTEGER,
 		child_id INTEGER,
