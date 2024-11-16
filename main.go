@@ -14,11 +14,13 @@ func main(){
 		fmt.Println(err)
 		return
 	}
-//close db
+
+	//schedule close db
 	defer db.Close()
 
 	fmt.Println("Connected to db")
-// get sqlute ver
+
+	// get sqlute ver
 	var sqliteVer string
 	err = db.QueryRow("SELECT sqlite_version()").Scan(&sqliteVer)
 	if err != nil{
@@ -26,4 +28,12 @@ func main(){
 		return
 	}
 	fmt.Println(sqliteVer)
+	
+	//create product table
+	_, err=createProductTable(db)
+	if err !=nil{
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("created product table ^^")
 }
