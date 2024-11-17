@@ -10,7 +10,7 @@ import (
 
 func main(){ 
 	//connect to db
-	db, err := sql.Open("sqlite3", "./factorydb")
+	db, err := sql.Open("sqlite3", "./data/factorydb")
 	if err != nil{
 		fmt.Println(err)
 		return
