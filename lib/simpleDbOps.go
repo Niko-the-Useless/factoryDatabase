@@ -1,11 +1,11 @@
-package main
+package lib
 
 import (
 	"database/sql"
 	"fmt"
 )
 
-func createProductsTable(db *sql.DB) (sql.Result, error){
+func CreateProductsTable(db *sql.DB) (sql.Result, error){
 	sql := `CREATE TABLE IF NOT EXISTS products (
 		id INTEGER PRIMARY KEY,
 		name TEXT UNIQE NOT NULL,
@@ -14,7 +14,7 @@ func createProductsTable(db *sql.DB) (sql.Result, error){
 	return db.Exec(sql)
 }
 
-func createMachinesTable(db *sql.DB) (sql.Result, error){
+func CreateMachinesTable(db *sql.DB) (sql.Result, error){
 	sql := `CREATE TABLE IF NOT EXISTS machines (
 		id INTEGER PRIMARY KEY,
 		name TEXT UNIQUE NOT NULL,
@@ -31,7 +31,7 @@ func createMachinesTable(db *sql.DB) (sql.Result, error){
 }
 // parent = product produced
 //child = product requred
-func createBomTable(db *sql.DB) (sql.Result, error){
+func CreateBomTable(db *sql.DB) (sql.Result, error){
 	sql := `CREATE TABLE IF NOT EXISTS BOM (
 		parent_id INTEGER NOT NULL,
 		parent_quantity INTEGER,
@@ -43,15 +43,15 @@ func createBomTable(db *sql.DB) (sql.Result, error){
 	return db.Exec(sql)
 }
 
-func insertProduct(db *sql.DB, Product *Product) (int64, error){
+func InsertProduct(db *sql.DB, Product *Product) (int64, error){
 	sql :=`INSERT INTO products (
 		name,
 		production_time)
 		VALUES (?,?);`
 
 	result, err :=db.Exec(sql,
-		Product.name,
-		Product.production_time)
+		Product.Name,
+		Product.Production_time)
 
 	if err !=nil{
 		return 0,err
@@ -59,7 +59,7 @@ func insertProduct(db *sql.DB, Product *Product) (int64, error){
 	return result.LastInsertId()
 }
 
-func insertMachine(db *sql.DB, Machine *Machine) (int64, error){
+func InsertMachine(db *sql.DB, Machine *Machine) (int64, error){
 	sql :=`INSERT INTO machines (
 		name,
 		crafting_speed,
@@ -73,15 +73,15 @@ func insertMachine(db *sql.DB, Machine *Machine) (int64, error){
 		VALUES (?,?,?,?,?,?,?,?,?);`
 
 	result, err :=db.Exec(sql,
-		Machine.name,
-		Machine.crafting_speed,
-		Machine.polution,
-		Machine.module_slot,
-		Machine.q_coef_a,
-		Machine.q_coef_b,
-		Machine.q5_mod,
-		Machine.drain,
-		Machine.energy_consumption)
+		Machine.Name,
+		Machine.Crafting_speed,
+		Machine.Polution,
+		Machine.Module_slot,
+		Machine.Q_coef_a,
+		Machine.Q_coef_b,
+		Machine.Q5_mod,
+		Machine.Drain,
+		Machine.Energy_consumption)
 
 	if err !=nil{
 		return 0,err
@@ -89,7 +89,7 @@ func insertMachine(db *sql.DB, Machine *Machine) (int64, error){
 	return result.LastInsertId()
 }
 
-func deleteProduct(db *sql.DB, arg interface{}) (int64, error){
+func DeleteProduct(db *sql.DB, arg interface{}) (int64, error){
 	var(
 		result sql.Result
 		err error
@@ -108,7 +108,7 @@ func deleteProduct(db *sql.DB, arg interface{}) (int64, error){
 	return result.RowsAffected()
 }
 
-func deleteMachine(db *sql.DB, arg interface{}) (int64, error){
+func DeleteMachine(db *sql.DB, arg interface{}) (int64, error){
 	var (
 		result sql.Result
 		err error

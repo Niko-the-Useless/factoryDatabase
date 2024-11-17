@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/Niko-the-Useless/factoryDatabase/lib"
 )
 
 
@@ -30,7 +31,7 @@ func main(){
 	fmt.Println(sqliteVer)
 	
 	//create products table
-	_, err=createProductsTable(db)
+	_, err=lib.CreateProductsTable(db)
 	if err !=nil{
 		fmt.Println(err)
 		return
@@ -38,7 +39,7 @@ func main(){
 	fmt.Println("created products table ^^")
 
 	//create machines table
-	_, err=createMachinesTable(db)
+	_, err=lib.CreateMachinesTable(db)
 	if err !=nil{
 		fmt.Println(err)
 		return
@@ -46,7 +47,7 @@ func main(){
 	fmt.Println("created machines table ^^")
 
 	//create BOM table
-	_, err=createBomTable(db)
+	_, err=lib.CreateBomTable(db)
 	if err !=nil{
 		fmt.Println(err)
 		return
@@ -54,29 +55,29 @@ func main(){
 	fmt.Println("created BOM table ^^")
 
 	//example data
-	productA := &Product{
-		name:"productA",
-		production_time: 2.5,
+	productA := &lib.Product{
+		Name:"productA",
+		Production_time: 2.5,
 	}
-	machineA := &Machine{
-		name:"machineA",
-		crafting_speed: 1,
-		polution: 2.2,
-		module_slot: 1,
-		q_coef_a: 0.2,
-		q_coef_b: 0.5,
-		q5_mod: 2,
-		drain: 2.5,
-		energy_consumption: 75,
+	machineA := &lib.Machine{
+		Name:"machineA",
+		Crafting_speed: 1,
+		Polution: 2.2,
+		Module_slot: 1,
+		Q_coef_a: 0.2,
+		Q_coef_b: 0.5,
+		Q5_mod: 2,
+		Drain: 2.5,
+		Energy_consumption: 75,
 	}
 
 	// inserting data
-	productId, err := insertProduct(db, productA)
+	productId, err := lib.InsertProduct(db, productA)
 	if err != nil{
 		fmt.Println(err)
 		return
 	}
-	machineId, err := insertMachine(db, machineA)
+	machineId, err := lib.InsertMachine(db, machineA)
 	if err != nil{
 		fmt.Println(err)
 		return
@@ -84,21 +85,27 @@ func main(){
 
 	//show inserted data
 	fmt.Printf("Product %s was inserted with ID: %d\n",
-		productA.name,productId,	
+		productA.Name,productId,	
 	)
 	fmt.Printf("Machine %s was inserted with ID: %d\n",
-		machineA.name,machineId,	
+		machineA.Name,machineId,	
 	)
 
 	//delete product with id 1
-	_,err = deleteProduct(db,1)
+	_,err = lib.DeleteProduct(db,1)
 	if err!=nil{fmt.Println(err)
 	return
 	}
-
+	fmt.Printf("Product %s was deleted with ID: %d\n",
+		productA.Name,1,	
+	)
 	//deleta machine with name machineA
-	_,err = deleteMachine(db,"machineA")
+	_,err = lib.DeleteMachine(db,"machineA")
 	if err!=nil{fmt.Println(err)
 	return
 	}
+	fmt.Printf("Machine %s was deleted with ID: %d\n",
+		machineA.Name,1,	
+	)
+
 }
