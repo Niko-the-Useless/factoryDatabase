@@ -90,4 +90,15 @@ func main(){
 		machineA.name,machineId,	
 	)
 
+	//delete product with id 1
+	_,err = deleteProduct(db,1)
+	if err!=nil{fmt.Println(err)
+	return
+	}
+
+	//deleta machine with name machineA
+	_,err = deleteMachine(db,"machineA")
+	if err!=nil{fmt.Println(err)
+	return
+	}
 }

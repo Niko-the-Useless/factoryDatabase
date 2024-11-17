@@ -2,12 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 func createProductsTable(db *sql.DB) (sql.Result, error){
 	sql := `CREATE TABLE IF NOT EXISTS products (
 		id INTEGER PRIMARY KEY,
-		name TEXT,
+		name TEXT UNIQE NOT NULL,
 		production_time REAL
 	);`
 	return db.Exec(sql)
@@ -16,7 +17,7 @@ func createProductsTable(db *sql.DB) (sql.Result, error){
 func createMachinesTable(db *sql.DB) (sql.Result, error){
 	sql := `CREATE TABLE IF NOT EXISTS machines (
 		id INTEGER PRIMARY KEY,
-		name TEXT,
+		name TEXT UNIQUE NOT NULL,
 		crafting_speed REAL,
 		polution REAL,
 		module_slot INTEGER,
@@ -86,4 +87,42 @@ func insertMachine(db *sql.DB, Machine *Machine) (int64, error){
 		return 0,err
 	}
 	return result.LastInsertId()
+}
+
+func deleteProduct(db *sql.DB, arg interface{}) (int64, error){
+	var(
+		result sql.Result
+		err error
+	)
+	switch i := arg.(type){
+		case int:
+			sql :=`DELETE FROM products WHERE id=?`
+			result, err=db.Exec(sql,i)
+		case string:
+			sql :=`DELETE FROM products WHERE name=?`
+			result, err=db.Exec(sql,i)
+		default:
+			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")
+	}
+	if err !=nil{return 0,err}
+	return result.RowsAffected()
+}
+
+func deleteMachine(db *sql.DB, arg interface{}) (int64, error){
+	var (
+		result sql.Result
+		err error
+	)
+	switch i := arg.(type) {
+		case int:
+			sql :=`DELETE FROM machines WHERE id=?`
+			result, err=db.Exec(sql,i)
+		case string:
+			sql :=`DELETE FROM machines WHERE name=?`
+			result, err=db.Exec(sql,i)
+		default:
+			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")
+	}
+	if err != nil {return 0,err}
+	return result.RowsAffected()
 }
