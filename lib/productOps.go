@@ -50,13 +50,13 @@ func DeleteProduct(db *sql.DB, target interface{}) (int64, error){
 	return result.RowsAffected()
 }
 
+/*
 func UpdateProduct(db *sql.DB, target interface{}, ProductUpdate ProductUpdate, newValue interface{}) (int64, error){
 	var(
 		result sql.Result
 		err error
 	)
 }
-
 func LoadProductsCSV(filename string) ([]Product, error) {
 
     file, err := os.Open(filename)
@@ -78,4 +78,4 @@ func LoadProductsCSV(filename string) ([]Product, error) {
 				})
     }
     return products, nil
-}
+}*/

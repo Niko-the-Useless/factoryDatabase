@@ -32,7 +32,7 @@ const(
 	Name = iota
 	Production_time
 )
-
+/*
 type MachineUpdate int
 const(
 	Name = iota
@@ -45,3 +45,4 @@ const(
 	Drain 
 	Energy_consumption 
 )
+*/
