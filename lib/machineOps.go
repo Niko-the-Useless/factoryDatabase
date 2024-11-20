@@ -69,33 +69,3 @@ func DeleteMachine(db *sql.DB, arg interface{}) (int64, error){
 	if err != nil {return 0,err}
 	return result.RowsAffected()
 }
-
-func ReadCSV(filename string) ([]Country, error) {
-    // Open the CSV file
-    file, err := os.Open(filename)
-    if err != nil {
-        return nil, err}
-    defer file.Close()
-
-    reader := csv.NewReader(file)
-    records, err := reader.ReadAll()
-    if err != nil {return nil, err}
-
-    var countries []Country
-    for _, record := range records[1:] { // Skip header row
-        population, err := strconv.Atoi(record[1])
-        if err != nil {return nil, err}
-
-        area, err := strconv.Atoi(record[2])
-        if err != nil {return nil, err}
-        
-				country := Country{
-            Name:       record[0],
-            Population: population,
-            Area:       area,
-        }
-        countries = append(countries, country)
-    }
-
-    return countries, nil
-}
