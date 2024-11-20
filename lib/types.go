@@ -25,3 +25,24 @@ type BOM struct {
 	Byproduct_id []int
 	Byproduct_quantity []int
 }
+
+//udaje że mam enumy
+type ProductUpdate int
+const(
+	Name = iota
+	Production_time
+)
+/*
+type MachineUpdate int
+const(
+	Name = iota
+	Crafting_speed 
+	Polution 
+	Module_slot 
+	Q_coef_a 
+	Q_coef_b 
+	Q5_mod 
+	Drain 
+	Energy_consumption 
+)
+*/
