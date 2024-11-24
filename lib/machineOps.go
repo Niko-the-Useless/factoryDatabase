@@ -51,21 +51,20 @@ func InsertMachine(db *sql.DB, Machine *Machine) (int64, error){
 	return result.LastInsertId()
 }
 
-func DeleteMachine(db *sql.DB, arg interface{}) (int64, error){
-	var (
+func DeleteMachine(db *sql.DB, target Target) (int64, error){
+	var(
 		result sql.Result
 		err error
 	)
-	switch i := arg.(type) {
-		case int:
+	if target.Id!=nil{
 			sql :=`DELETE FROM machines WHERE id=?`
-			result, err=db.Exec(sql,i)
-		case string:
+			result, err=db.Exec(sql,target.Id)
+	}else if target.Name!=nil{
 			sql :=`DELETE FROM machines WHERE name=?`
-			result, err=db.Exec(sql,i)
-		default:
-			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")
-	}
-	if err != nil {return 0,err}
+			result, err=db.Exec(sql,target.Name)
+	}else{
+			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")}
+	
+	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }

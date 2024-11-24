@@ -29,27 +29,23 @@ func InsertProduct(db *sql.DB, Product *Product) (int64, error){
 	}
 	return result.LastInsertId()
 }
-
-func DeleteProduct(db *sql.DB, target interface{}) (int64, error){
+func DeleteProduct(db *sql.DB, target Target) (int64, error){
 	var(
 		result sql.Result
 		err error
 	)
-	
-	switch i := target.(type){
-		case int:
+	if target.Id!=nil{
 			sql :=`DELETE FROM products WHERE id=?`
-			result, err=db.Exec(sql,i)
-		case string:
+			result, err=db.Exec(sql,target.Id)
+	}else if target.Name!=nil{
 			sql :=`DELETE FROM products WHERE name=?`
-			result, err=db.Exec(sql,i)
-		default:
-			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")
-	}
+			result, err=db.Exec(sql,target.Name)
+	}else{
+			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")}
+	
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }
-
 /*
 func UpdateProduct(db *sql.DB, target interface{}, ProductUpdate ProductUpdate, newValue interface{}) (int64, error){
 	var(

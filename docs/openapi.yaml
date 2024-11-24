@@ -6,42 +6,99 @@ info:
 servers:
   -url: http://localhost:8080
   description: local dev servers
+
+#Misc
 paths:
   /:
     get:
-      summary: Home page
+      summary: Home page greeter
       description: Shows welcome msg
       response:
         '200':
-          description: success
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: "factory database home page"
-  /create-product-table:
+          description: Succesfully created table
+
+#Products
+  /create-products-table:
     post:
-      summary: Create Product Table
-      description: Creates product table in db
+      summary: Create Products Table
+      description: Creates products table in db
       response:
         '200':
           description: success
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: "table created"
         '405':
           description: Method Not Allowed
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: "only post method allowed"
         '500':
           description: Internal Server Error
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: "Creating product table failed: <error msg>"
+
+  /insert-product:
+    post:
+      summary: Inserts JSON product payload
+      description: Inserts JSON product payload
+      requestBody:
+        requred: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  type: string
+                Production_time:
+                  type: number
+      response:
+        '201':
+          description: data inserted with id:<id>
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Internal Server Error
+
+#Machines
+  /create-machines-table:
+    post:
+      summary: Create Machines Table
+      description: Creates machines table in db
+      response:
+        '200':
+          description: Succesfully created table
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Internal Server Error
+
+  /insert-machine:
+    post:
+      summary: Inserts JSON machine payload
+      description: Inserts JSON machine payload
+      requestBody:
+        requred: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  type: string
+                Crafting_speed: 
+                  type: number
+                Polution:
+                  type: number
+                Module_slot:
+                  type: integer
+                Q_coef_a:
+                  type: number
+                Q_coef_b:
+                  type: number
+                Q5_mod:
+                  type: number
+                Drain:
+                  type: number
+                Energy_consumption:
+                  type: number
+      response:
+        '201':
+          description: data inserted with id:<id>
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Internal Server Error
