@@ -1,5 +1,5 @@
 BINARY_NAME=factoryDbAPI
-GOFILES= main.go
+GOFILES= server.go
 
 all: run
 

@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Factory Database API
+  description: API for managing factory Database
+  version: 0.1.1
+servers:
+  -url: http://localhost:8080
+  description: local dev servers
+paths:
+  /:
+    get:
+      summary: Home page
+      description: Shows welcome msg
+      response:
+        '200':
+          description: success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "factory database home page"
+  /create-product-table:
+    post:
+      summary: Create Product Table
+      description: Creates product table in db
+      response:
+        '200':
+          description: success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "table created"
+        '405':
+          description: Method Not Allowed
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "only post method allowed"
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Creating product table failed: <error msg>"
