@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"database/sql"
+	"encoding/json"
 	"net/http"
 )
 
@@ -20,6 +21,25 @@ func CreateProductsTableHandler(db *sql.DB) http.HandlerFunc {
 
 	}
 }
+func InsertProductHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request){
+		
+		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
+			return}
+
+		var Product Product
+		if json.NewDecoder(r.Body).Decode(&Product)!=nil{
+			http.Error(w,"invalid JSON",http.StatusBadRequest)
+			return}
+
+		id,err:=InsertProduct(db,&Product)
+		if err!=nil{http.Error(w,fmt.Sprintf("Cant insert product :%v",err),http.StatusInternalServerError)
+			return}
+		
+		w.WriteHeader(http.StatusCreated)
+		fmt.Fprint(w,fmt.Sprintf("Product inserted with id: %d",id))
+	}
+}
 
 func CreateMachinesTableHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
@@ -33,5 +53,25 @@ func CreateMachinesTableHandler(db *sql.DB) http.HandlerFunc {
 	
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w,"table created")
+	}
+}
+
+func InsertMachineHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request){
+		
+		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
+			return}
+
+		var Machine Machine
+		if json.NewDecoder(r.Body).Decode(&Machine)!=nil{
+			http.Error(w,"invalid JSON",http.StatusBadRequest)
+			return}
+
+		id,err:=InsertMachine(db,&Machine)
+		if err!=nil{http.Error(w,fmt.Sprintf("Cant insert product :%v",err),http.StatusInternalServerError)
+			return}
+		
+		w.WriteHeader(http.StatusCreated)
+		fmt.Fprint(w,fmt.Sprintf("Machine inserted with id: %d",id))
 	}
 }

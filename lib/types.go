@@ -26,6 +26,11 @@ type BOM struct {
 	Byproduct_quantity []int
 }
 
+type Target struct{
+	Id *int
+	Name *string
+}
+
 //udaje że mam enumy
 type ProductUpdate int
 const(
