@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/Niko-the-Useless/factoryDatabase/routes"
 )

@@ -21,7 +21,7 @@ func CreateMachinesTable(db *sql.DB) (sql.Result, error){
 	return db.Exec(sql)
 }
 
-func InsertMachine(db *sql.DB, Machine *Machine) (int64, error){
+func ( Machine *Machine) InsertMachine(db *sql.DB) (int64, error){
 	sql :=`INSERT INTO machines (
 		name,
 		crafting_speed,
@@ -51,7 +51,8 @@ func InsertMachine(db *sql.DB, Machine *Machine) (int64, error){
 	return result.LastInsertId()
 }
 
-func DeleteMachine(db *sql.DB, target Target) (int64, error){
+func (target Target) DeleteMachine(db *sql.DB) (int64, error){
+
 	var(
 		result sql.Result
 		err error

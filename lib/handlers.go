@@ -6,18 +6,19 @@ import (
 	"encoding/json"
 	"net/http"
 )
-
+//Misc
 func HomeHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Fprint(w, "factory database home page")
 }
 
+//Products
 func CreateProductsTableHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
 		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed);return}
 		_, err:=CreateProductsTable(db)
 		if err!=nil{http.Error(w, fmt.Sprintf("Creating product table failed: %v",err),http.StatusInternalServerError);return}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("table created"))
+		fmt.Fprint(w, "Created product table")
 
 	}
 }
@@ -32,7 +33,7 @@ func InsertProductHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w,"invalid JSON",http.StatusBadRequest)
 			return}
 
-		id,err:=InsertProduct(db,&Product)
+		id,err:=Product.InsertProduct(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("Cant insert product :%v",err),http.StatusInternalServerError)
 			return}
 		
@@ -56,7 +57,7 @@ func DeleteProductHandler(db *sql.DB) http.HandlerFunc{
 			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
 			return}
 
-		id,err:=DeleteProduct(db,Target)
+		id,err:=Target.DeleteProduct(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("Cant delete product :%v",err),http.StatusInternalServerError)
 			return}
 		
@@ -92,7 +93,7 @@ func InsertMachineHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w,"invalid JSON",http.StatusBadRequest)
 			return}
 
-		id,err:=InsertMachine(db,&Machine)
+		id,err:=Machine.InsertMachine(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("Cant insert product :%v",err),http.StatusInternalServerError)
 			return}
 		
@@ -116,7 +117,7 @@ func DeleteMachineHandler(db *sql.DB) http.HandlerFunc{
 			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
 			return}
 
-		id,err:=DeleteMachine(db,Target)
+		id,err:=Target.DeleteMachine(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("Cant delete machine :%v",err),http.StatusInternalServerError)
 			return}
 		w.WriteHeader(http.StatusNoContent)

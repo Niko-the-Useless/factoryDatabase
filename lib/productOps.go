@@ -14,7 +14,7 @@ func CreateProductsTable(db *sql.DB) (sql.Result, error){
 	return db.Exec(sql)
 }
 
-func InsertProduct(db *sql.DB, Product *Product) (int64, error){
+func (Product *Product) InsertProduct(db *sql.DB) (int64, error){
 	sql :=`INSERT INTO products (
 		name,
 		production_time)
@@ -29,11 +29,13 @@ func InsertProduct(db *sql.DB, Product *Product) (int64, error){
 	}
 	return result.LastInsertId()
 }
-func DeleteProduct(db *sql.DB, target Target) (int64, error){
+
+func (target Target) DeleteProduct(db *sql.DB) (int64, error){
 	var(
 		result sql.Result
 		err error
 	)
+
 	if target.Id!=nil{
 			sql :=`DELETE FROM products WHERE id=?`
 			result, err=db.Exec(sql,target.Id)
@@ -46,32 +48,3 @@ func DeleteProduct(db *sql.DB, target Target) (int64, error){
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }
-/*
-func UpdateProduct(db *sql.DB, target interface{}, ProductUpdate ProductUpdate, newValue interface{}) (int64, error){
-	var(
-		result sql.Result
-		err error
-	)
-}
-func LoadProductsCSV(filename string) ([]Product, error) {
-
-    file, err := os.Open(filename)
-    if err!=nil{return nil, err}
-    defer file.Close()
-
-    reader := csv.NewReader(file)
-    data, err := reader.ReadAll()
-    if err!=nil{return nil, err}
-
-    var products []Product
-    for _, dat := range data[1:] { 
-        ProdTime, err := strconv.Atoi(dat[1])
-        if err!=nil{return nil, err}
-
-				products=append(products,Product{
-					Name:dat[0],
-					Production_time: ProdTime,
-				})
-    }
-    return products, nil
-}*/
