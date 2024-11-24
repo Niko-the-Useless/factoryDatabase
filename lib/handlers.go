@@ -20,3 +20,18 @@ func CreateProductsTableHandler(db *sql.DB) http.HandlerFunc {
 
 	}
 }
+
+func CreateMachinesTableHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request){
+		
+		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
+			return}
+	
+		_, err:=CreateMachinesTable(db)
+		if err!=nil{http.Error(w, fmt.Sprintf("Creating machines table failed: %v",err),http.StatusInternalServerError)
+			return}
+	
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w,"table created")
+	}
+}

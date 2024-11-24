@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-//	"github.com/Niko-the-Useless/factoryDatabase/lib"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/Niko-the-Useless/factoryDatabase/routes"
 )
