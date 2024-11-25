@@ -2,7 +2,6 @@ package lib
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 func CreateProductsTable(db *sql.DB) (sql.Result, error){
@@ -31,20 +30,16 @@ func (Product *Product) InsertProduct(db *sql.DB) (int64, error){
 }
 
 func (target Target) DeleteProduct(db *sql.DB) (int64, error){
-	var(
+	var (
 		result sql.Result
 		err error
 	)
 
-	if target.Id!=nil{
-			sql :=`DELETE FROM products WHERE id=?`
-			result, err=db.Exec(sql,target.Id)
-	}else if target.Name!=nil{
-			sql :=`DELETE FROM products WHERE name=?`
-			result, err=db.Exec(sql,target.Name)
-	}else{
-			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")}
-	
+	id,err:=target.GetId(db)
+	if err!=nil{return 0,err}
+
+	sql :=`DELETE FROM products WHERE id=?`
+	result, err=db.Exec(sql,id)
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }

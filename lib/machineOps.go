@@ -2,7 +2,6 @@ package lib
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 func CreateMachinesTable(db *sql.DB) (sql.Result, error){
@@ -52,20 +51,13 @@ func ( Machine *Machine) InsertMachine(db *sql.DB) (int64, error){
 }
 
 func (target Target) DeleteMachine(db *sql.DB) (int64, error){
-
-	var(
-		result sql.Result
-		err error
-	)
-	if target.Id!=nil{
-			sql :=`DELETE FROM machines WHERE id=?`
-			result, err=db.Exec(sql,target.Id)
-	}else if target.Name!=nil{
-			sql :=`DELETE FROM machines WHERE name=?`
-			result, err=db.Exec(sql,target.Name)
-	}else{
-			return 0, fmt.Errorf("wrong argument type: supported types int-id string-name")}
+	var result sql.Result
 	
+	id,err:=target.GetId(db)
+	if err!=nil{return 0,err}
+
+	sql :=`DELETE FROM machines WHERE id=?`
+	result, err=db.Exec(sql,id)
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }
