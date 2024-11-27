@@ -2,6 +2,7 @@ package lib
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 func CreateProductsTable(db *sql.DB) (sql.Result, error){
@@ -12,7 +13,6 @@ func CreateProductsTable(db *sql.DB) (sql.Result, error){
 	);`
 	return db.Exec(sql)
 }
-
 func (Product *Product) InsertProduct(db *sql.DB) (int64, error){
 	sql :=`INSERT INTO products (
 		name,
@@ -29,33 +29,48 @@ func (Product *Product) InsertProduct(db *sql.DB) (int64, error){
 	return result.LastInsertId()
 }
 
+func (target Target) GetProductId (db *sql.DB) (int64, error){
+	var(
+		err error
+		id int64
+	)
+
+	if target.Id!=nil{
+		id=*target.Id
+	}
+	if target.Name!=nil{
+		sql:=`SELECT id FROM products WHERE name=?`
+		err=db.QueryRow(sql,target.Name).Scan(&id)
+		if err!=nil{return 0, fmt.Errorf("Cant find product: %v",err)}
+	}
+	return id,nil
+}
+
 func (target Target) DeleteProduct(db *sql.DB) (int64, error){
 	var (
 		result sql.Result
 		err error
 	)
 
-	id,err:=target.GetId(db)
+	id,err:=target.GetProductId(db)
 	if err!=nil{return 0,err}
 
-	sql :=`DELETE FROM products WHERE id=?`
+	sql :=`DELETE * FROM products WHERE id=?`
 	result, err=db.Exec(sql,id)
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }
 
-func (target Target) GetProduct(db *sql.DB) (Product, error){
-	var (
-		result sql.Result
-		err error
-	)
-	product:=&Product{}
+func (target Target) GetProduct(db *sql.DB) (*Product, error){
+	p:=&Product{}
+	var err error
 
-	id,err:=target.GetId(db)
-	if err!=nil{return *product,err}
+	id,err:=target.GetProductId(db)
+	if err!=nil{return nil,err}
 
-	sql :=`DELETE FROM products WHERE id=?`
-	row :=db.QueryRow(db,id)
-	return *product,nil
+	sql := `SELECT * FROM products WHERE id=?`
+	row := db.QueryRow(sql,id)
+	err = row.Scan(&p.Id, &p.Name, &p.Production_time)
+	if err!=nil{return nil,err}
+	return p,nil
 }
-

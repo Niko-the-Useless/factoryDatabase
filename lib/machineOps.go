@@ -2,6 +2,7 @@ package lib
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 func CreateMachinesTable(db *sql.DB) (sql.Result, error){
@@ -19,7 +20,6 @@ func CreateMachinesTable(db *sql.DB) (sql.Result, error){
 	);`
 	return db.Exec(sql)
 }
-
 func ( Machine *Machine) InsertMachine(db *sql.DB) (int64, error){
 	sql :=`INSERT INTO machines (
 		name,
@@ -50,14 +50,44 @@ func ( Machine *Machine) InsertMachine(db *sql.DB) (int64, error){
 	return result.LastInsertId()
 }
 
+func (target Target) GetMachineId (db *sql.DB) (int64, error){
+	var(
+		err error
+		id int64
+	)
+
+	if target.Id!=nil{
+		id=*target.Id
+	}
+	if target.Name!=nil{
+		sql:=`SELECT id FROM machines WHERE name=?`
+		err=db.QueryRow(sql,target.Name).Scan(&id)
+		if err!=nil{return 0, fmt.Errorf("Cant find product: %v",err)}
+	}
+	return id,nil
+}
+
 func (target Target) DeleteMachine(db *sql.DB) (int64, error){
 	var result sql.Result
 	
-	id,err:=target.GetId(db)
+	id,err:=target.GetMachineId(db)
 	if err!=nil{return 0,err}
 
-	sql :=`DELETE FROM machines WHERE id=?`
+	sql :=`DELETE * FROM machines WHERE id=?`
 	result, err=db.Exec(sql,id)
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
+}
+func (target Target) GetMachine(db *sql.DB) (*Machine, error){
+	m:=&Machine{}
+	var err error
+
+	id,err:=target.GetMachineId(db)
+	if err!=nil{return nil,err}
+
+	sql:=`SELECT * FROM machines WHERE id=?`
+	row:=db.QueryRow(sql,id)
+	err = row.Scan(&m.Id, &m.Name, &m.Crafting_speed, &m.Polution, &m.Module_slot, &m.Q_coef_a, &m.Q_coef_b, &m.Q5_mod, &m.Drain, &m.Energy_consumption)
+	if err!=nil{return nil,err}
+	return m,nil
 }

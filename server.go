@@ -24,5 +24,4 @@ func main(){
 	log.Printf("Starting server on port: %s",port)
 	err=http.ListenAndServe(port,mux)
 	if err!=nil{fmt.Println("cant start server:",err)}
-
 }

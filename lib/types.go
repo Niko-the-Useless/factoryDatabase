@@ -1,11 +1,13 @@
 package lib
 
 type Product struct {
+	Id int
 	Name string
 	Production_time float32
 }
 
 type Machine struct {
+	Id int
 	Name string
 	Crafting_speed float32
 	Polution float32

@@ -21,7 +21,6 @@ func CreateMachinesTableHandler(db *sql.DB) http.HandlerFunc {
 		fmt.Fprint(w,"table created")
 	}
 }
-
 func InsertMachineHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
 		
@@ -39,6 +38,29 @@ func InsertMachineHandler(db *sql.DB) http.HandlerFunc {
 		
 		w.WriteHeader(http.StatusCreated)
 		fmt.Fprint(w,fmt.Sprintf("Machine inserted with id: %d",id))
+	}
+}
+func GetMachineIdHandler(db *sql.DB) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
+
+		var target Target
+
+		if r.Method!=http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
+			return}
+		
+		if json.NewDecoder(r.Body).Decode(&target)!=nil{
+			http.Error(w,"invalid JSON",http.StatusBadRequest)
+			return
+		}
+
+		if target.Name==nil&&target.Id==nil{
+			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
+			return}
+
+		id,err:=target.GetMachineId(db)
+		if err!=nil{http.Error(w,fmt.Sprintf("Cant get id: %v",err),http.StatusInternalServerError);return}
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w,"Id: ",id)
 	}
 }
 func DeleteMachineHandler(db *sql.DB) http.HandlerFunc{
