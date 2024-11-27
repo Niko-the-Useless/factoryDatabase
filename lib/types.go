@@ -1,9 +1,9 @@
 package lib
 
 type Product struct {
-	Id int
-	Name string
-	Production_time float32
+	Id *int
+	Name *string
+	Production_time *float32
 }
 
 type Machine struct {
