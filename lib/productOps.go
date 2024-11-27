@@ -43,3 +43,19 @@ func (target Target) DeleteProduct(db *sql.DB) (int64, error){
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }
+
+func (target Target) GetProduct(db *sql.DB) (Product, error){
+	var (
+		result sql.Result
+		err error
+	)
+	product:=&Product{}
+
+	id,err:=target.GetId(db)
+	if err!=nil{return *product,err}
+
+	sql :=`DELETE FROM products WHERE id=?`
+	row :=db.QueryRow(db,id)
+	return *product,nil
+}
+
