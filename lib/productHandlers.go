@@ -51,7 +51,7 @@ func GetProductIdHandler(db *sql.DB) http.HandlerFunc{
 			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
 			return}
 
-		id,err:=target.GetMachineId(db)
+		id,err:=target.GetProductId(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("Cant get id: %v",err),http.StatusInternalServerError);return}
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w,"Id: ",id)
