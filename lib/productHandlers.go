@@ -34,46 +34,48 @@ func InsertProductHandler(db *sql.DB) http.HandlerFunc {
 		fmt.Fprint(w,fmt.Sprintf("Product inserted with id: %d",id))
 	}
 }
+
 func GetProductIdHandler(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 
-		var target Target
+		var product Product
 
 		if r.Method!=http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
 			return}
 		
-		if json.NewDecoder(r.Body).Decode(&target)!=nil{
+		if json.NewDecoder(r.Body).Decode(&product)!=nil{
 			http.Error(w,"invalid JSON",http.StatusBadRequest)
 			return
 		}
 
-		if target.Name==nil&&target.Id==nil{
+		if product.Name==nil&&product.Id==nil{
 			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
 			return}
 
-		id,err:=target.GetProductId(db)
+		id,err:=product.GetProductId(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("Cant get id: %v",err),http.StatusInternalServerError);return}
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w,"Id: ",id)
 	}
 }
+
 func DeleteProductHandler(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 
-		var Target Target
+		var product Product
 		
 		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
 			return}
 
-		if json.NewDecoder(r.Body).Decode(&Target)!=nil{
+		if json.NewDecoder(r.Body).Decode(&product)!=nil{
 			http.Error(w,"invalid JSON",http.StatusBadRequest)
 			return}
 
-		if Target.Name==nil&&Target.Id==nil{
+		if product.Name==nil&&product.Id==nil{
 			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
 			return}
 
-		id,err:=Target.DeleteProduct(db)
+		id,err:=product.DeleteProduct(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("Cant delete product :%v",err),http.StatusInternalServerError)
 			return}
 		
@@ -82,24 +84,26 @@ func DeleteProductHandler(db *sql.DB) http.HandlerFunc{
 
 	}
 }
+
 func GetProductHandler(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 	
-		var Target Target
+		var product Product
+
 		w.Header().Set("Content-Type","application/json")
 		
 		if r.Method != http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
 			return}
 
-		if json.NewDecoder(r.Body).Decode(&Target)!=nil{
+		if json.NewDecoder(r.Body).Decode(&product)!=nil{
 			http.Error(w,"invalid JSON",http.StatusBadRequest)
 			return}
 
-		if Target.Name==nil&&Target.Id==nil{
+		if product.Name==nil&&product.Id==nil{
 			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
 			return}
 
-		product,err:=Target.GetProduct(db)
+		err:=product.GetProduct(db)
 		if err!=nil{http.Error(w,fmt.Sprintf("cant find product: %v",err),
 			http.StatusInternalServerError)
 		return}

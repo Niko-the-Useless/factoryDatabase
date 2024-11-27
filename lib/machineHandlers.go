@@ -43,7 +43,7 @@ func InsertMachineHandler(db *sql.DB) http.HandlerFunc {
 func GetMachineIdHandler(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 
-		var target Target
+		var target Machine
 
 		if r.Method!=http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
 			return}
@@ -66,7 +66,7 @@ func GetMachineIdHandler(db *sql.DB) http.HandlerFunc{
 func DeleteMachineHandler(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 
-		var Target Target
+		var Target Machine
 		
 		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
 			return}

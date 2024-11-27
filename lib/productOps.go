@@ -29,30 +29,30 @@ func (Product *Product) InsertProduct(db *sql.DB) (int64, error){
 	return result.LastInsertId()
 }
 
-func (target Target) GetProductId (db *sql.DB) (int64, error){
+func (product Product) GetProductId (db *sql.DB) (int64, error){
 	var(
 		err error
 		id int64
 	)
 
-	if target.Id!=nil{
-		id=*target.Id}
+	if product.Id!=nil{
+		id=*product.Id}
 
-	if target.Name!=nil{
+	if product.Name!=nil{
 		sql:=`SELECT id FROM products WHERE name=?`
-		err=db.QueryRow(sql,target.Name).Scan(&id)
+		err=db.QueryRow(sql,product.Name).Scan(&id)
 		if err!=nil{return 0, fmt.Errorf("Cant find product: %v",err)}}
 
 	return id,nil
 }
 
-func (target Target) DeleteProduct(db *sql.DB) (int64, error){
+func (product Product) DeleteProduct(db *sql.DB) (int64, error){
 	var (
 		result sql.Result
 		err error
 	)
 
-	id,err:=target.GetProductId(db)
+	id,err:=product.GetProductId(db)
 	if err!=nil{return 0,err}
 
 	sql :=`DELETE * FROM products WHERE id=?`
@@ -61,16 +61,15 @@ func (target Target) DeleteProduct(db *sql.DB) (int64, error){
 	return result.RowsAffected()
 }
 
-func (target Target) GetProduct(db *sql.DB) (*Product, error){
-	p:=&Product{}
+func (p *Product) GetProduct(db *sql.DB) (error){
 	var err error
 
-	id,err:=target.GetProductId(db)
-	if err!=nil{return nil,err}
+	id,err:=p.GetProductId(db)
+	if err!=nil{return err}
 
 	sql := `SELECT * FROM products WHERE id=?`
 	row := db.QueryRow(sql,id)
 	err = row.Scan(&p.Id, &p.Name, &p.Production_time)
-	if err!=nil{return nil,err}
-	return p,nil
+	if err!=nil{return err}
+	return nil
 }

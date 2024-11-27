@@ -50,24 +50,24 @@ func ( Machine *Machine) InsertMachine(db *sql.DB) (int64, error){
 	return result.LastInsertId()
 }
 
-func (target Target) GetMachineId (db *sql.DB) (int64, error){
+func (machine Machine) GetMachineId (db *sql.DB) (int64, error){
 	var(
 		err error
 		id int64
 	)
 
-	if target.Id!=nil{
-		id=*target.Id
+	if machine.Id!=nil{
+		id=*machine.Id
 	}
-	if target.Name!=nil{
+	if machine.Name!=nil{
 		sql:=`SELECT id FROM machines WHERE name=?`
-		err=db.QueryRow(sql,target.Name).Scan(&id)
+		err=db.QueryRow(sql,machine.Name).Scan(&id)
 		if err!=nil{return 0, fmt.Errorf("Cant find product: %v",err)}
 	}
 	return id,nil
 }
 
-func (target Target) DeleteMachine(db *sql.DB) (int64, error){
+func (target Machine) DeleteMachine(db *sql.DB) (int64, error){
 	var result sql.Result
 	
 	id,err:=target.GetMachineId(db)
@@ -78,16 +78,17 @@ func (target Target) DeleteMachine(db *sql.DB) (int64, error){
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }
-func (target Target) GetMachine(db *sql.DB) (*Machine, error){
-	m:=&Machine{}
+
+func (m *Machine) GetMachine(db *sql.DB) (error){
+
 	var err error
 
-	id,err:=target.GetMachineId(db)
-	if err!=nil{return nil,err}
+	id,err:=m.GetMachineId(db)
+	if err!=nil{return err}
 
 	sql:=`SELECT * FROM machines WHERE id=?`
 	row:=db.QueryRow(sql,id)
 	err = row.Scan(&m.Id, &m.Name, &m.Crafting_speed, &m.Polution, &m.Module_slot, &m.Q_coef_a, &m.Q_coef_b, &m.Q5_mod, &m.Drain, &m.Energy_consumption)
-	if err!=nil{return nil,err}
-	return m,nil
+	if err!=nil{return err}
+	return nil
 }
