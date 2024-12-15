@@ -1,0 +1,68 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Factory DB API",
+    "description": "API for managing factory database operations.",
+    "version": "0.1.5"
+  },
+  "servers":[
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development server"
+    }],
+  "tags": [
+    {
+      "name": "product",
+      "description": "Operations related to products"
+    },
+    {
+      "name": "machine",
+      "description": "Operations related to machines"
+    },
+    {
+      "name": "misc",
+      "description": "Miscellaneous operations"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "product"
+        ],
+        "summary": "Greeter page",
+        "description": "Displays a welcome message.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Welcome to the Factory DB API!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+		"product/create-table":{
+			"post":{
+				"tags":["product"],
+				"summary": "create product table in db",
+				"responses": {
+					"200":{
+						"description":"Succesfult created products table in db"
+					}
+				}
+			}
+		}
+  }
+}
+

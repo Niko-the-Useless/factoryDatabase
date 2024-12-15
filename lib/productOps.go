@@ -13,6 +13,7 @@ func CreateProductsTable(db *sql.DB) (sql.Result, error){
 	);`
 	return db.Exec(sql)
 }
+
 func (Product *Product) InsertProduct(db *sql.DB) (int64, error){
 	sql :=`INSERT INTO products (
 		name,
@@ -30,39 +31,31 @@ func (Product *Product) InsertProduct(db *sql.DB) (int64, error){
 }
 
 func (product Product) GetProductId (db *sql.DB) (int64, error){
-	var(
-		err error
-		id int64
-	)
+	var	id int64
 
 	if product.Id!=nil{
 		id=*product.Id}
 
 	if product.Name!=nil{
 		sql:=`SELECT id FROM products WHERE name=?`
-		err=db.QueryRow(sql,product.Name).Scan(&id)
+		err:=db.QueryRow(sql,product.Name).Scan(&id)
 		if err!=nil{return 0, fmt.Errorf("Cant find product: %v",err)}}
 
 	return id,nil
 }
 
 func (product Product) DeleteProduct(db *sql.DB) (int64, error){
-	var (
-		result sql.Result
-		err error
-	)
 
 	id,err:=product.GetProductId(db)
 	if err!=nil{return 0,err}
 
 	sql :=`DELETE * FROM products WHERE id=?`
-	result, err=db.Exec(sql,id)
+	result, err:=db.Exec(sql,id)
 	if err !=nil{return 0,err}
 	return result.RowsAffected()
 }
 
 func (p *Product) GetProduct(db *sql.DB) (error){
-	var err error
 
 	id,err:=p.GetProductId(db)
 	if err!=nil{return err}
@@ -73,3 +66,17 @@ func (p *Product) GetProduct(db *sql.DB) (error){
 	if err!=nil{return err}
 	return nil
 }
+
+func (newProd *Product) UpdateProduct(db *sql.DB) (int64, error){
+	prod:=newProd
+	prod.GetProduct(db)
+
+	if newProd.Name!=nil{prod.Name=newProd.Name}
+	if newProd.Production_time!=nil{prod.Production_time=newProd.Production_time}
+
+	sql:=`UPDATE products SET name=?, production_time=?`
+	res,err:=db.Exec(sql, prod.Name, prod.Production_time)
+	if err!=nil{return 0,fmt.Errorf("cant update product: %v", err)}
+	return res.RowsAffected()
+}
+

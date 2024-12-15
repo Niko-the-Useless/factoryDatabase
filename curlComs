@@ -1,0 +1,16 @@
+curl http://localhost:8080
+
+curl -X GET http://localhost:8080/product/get-id \    
+-H "Content-Type: application/json" \
+-d '{
+    "name": "awdawd"
+}'
+
+curl -X POST http://localhost:8080/product/create-table
+
+curl -X POST http://localhost:8080/product/insert \
+-H "Content-Type: application/json" \
+-d '{
+    "Name": "<string>",
+    "ProductionTime": <int>
+}'

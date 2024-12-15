@@ -86,3 +86,27 @@ func DeleteMachineHandler(db *sql.DB) http.HandlerFunc{
 		fmt.Fprint(w,fmt.Sprintf("Machine with id: %d was deleted",id))
 	}
 }
+
+func UpdateMachineHandler(db *sql.DB) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
+		var newMach Machine
+		w.Header().Set("Content-Type","application/json")
+
+		if r.Method!=http.MethodPatch{http.Error(w,"only patch method allowed",http.StatusMethodNotAllowed)
+		return}
+
+		if json.NewDecoder(r.Body).Decode(&newMach)!=nil{http.Error(w,"invalid json",http.StatusBadRequest)
+		return}
+
+		if newMach.Name==nil&&newMach.Id==nil{
+			http.Error(w,"provide name or id",http.StatusBadRequest)
+			return}
+
+		machId,err:=newMach.UpdateMachine(db)
+		if err!=nil{http.Error(w,fmt.Sprintf("cant update machine %v",err),http.StatusInternalServerError)
+		return}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w,fmt.Sprintf("machine with id %d updated",machId))
+	}
+}

@@ -1,0 +1,29 @@
+openapi: 3.0.0
+info:
+  title: Factory DB API
+  description: API for factory DB
+  version: 0.1.5
+servers:
+  - url: http://localhost:8080
+paths:
+  /prod/prod/prod:
+    get:
+    summary: Home Page Greeter
+    tags:
+      - misc
+    responses:
+      200:
+        description: Greeter misc
+    /product/create-table:
+      post:
+      summary: Create Products table
+      tags:
+        - product
+      description: Create products table in DB
+      responses:
+        200:
+          description: Succress
+        405:
+          description: Method not allowed
+        500:
+          description: Internal server error

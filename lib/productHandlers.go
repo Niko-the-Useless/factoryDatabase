@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 )
+
 func CreateProductsTableHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
 		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed);return}
@@ -15,6 +16,7 @@ func CreateProductsTableHandler(db *sql.DB) http.HandlerFunc {
 		fmt.Fprint(w, "Created product table")
 	}
 }
+
 func InsertProductHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
 		
@@ -64,7 +66,7 @@ func DeleteProductHandler(db *sql.DB) http.HandlerFunc{
 
 		var product Product
 		
-		if r.Method != http.MethodPost{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
+		if r.Method != http.MethodDelete{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
 			return}
 
 		if json.NewDecoder(r.Body).Decode(&product)!=nil{
@@ -81,7 +83,6 @@ func DeleteProductHandler(db *sql.DB) http.HandlerFunc{
 		
 		w.WriteHeader(http.StatusNoContent)
 		fmt.Fprint(w,fmt.Sprintf("Product with id: %d was deleted",id))
-
 	}
 }
 
@@ -89,7 +90,6 @@ func GetProductHandler(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 	
 		var product Product
-
 		w.Header().Set("Content-Type","application/json")
 		
 		if r.Method != http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
@@ -110,5 +110,31 @@ func GetProductHandler(db *sql.DB) http.HandlerFunc{
 
 		if json.NewEncoder(w).Encode(product)!=nil{http.Error(w,"failed to encode json ",http.StatusInternalServerError)
 		return}
+	}
+}
+
+func UpdateProductHandler(db *sql.DB) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
+	
+		var newProduct Product
+		w.Header().Set("Content-Type","application/json")
+		
+		if r.Method != http.MethodPatch{http.Error(w,"only patch method allowed",http.StatusMethodNotAllowed)
+			return}
+
+		if json.NewDecoder(r.Body).Decode(&newProduct)!=nil{
+			http.Error(w,"invalid JSON",http.StatusBadRequest)
+			return}
+
+		if newProduct.Name==nil&&newProduct.Id==nil{
+			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
+			return}
+
+		prodId,err:=newProduct.UpdateProduct(db)
+		if err!=nil{http.Error(w,fmt.Sprintf("cant update product %v",err),http.StatusInternalServerError)
+			return}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w,fmt.Sprintf("product with id %d updated",prodId))
 	}
 }
