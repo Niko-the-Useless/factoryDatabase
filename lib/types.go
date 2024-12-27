@@ -20,10 +20,10 @@ type Machine struct {
 }
 
 type BOM struct {
-	Parent_id int
-	Parent_quantity []int
-	Child_id []int 
-	Child_quantity []int
-	Byproduct_id []int
-	Byproduct_quantity []int
+	Parent_id *[]int64
+	Parent_quantity *[]int64
+	Child_id *int64
+	Child_quantity *int64
+	Byproduct_id *[]int64
+	Byproduct_quantity *[]int64
 }
