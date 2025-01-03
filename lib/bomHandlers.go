@@ -21,131 +21,110 @@ func InsertBomHandler(db *sql.DB) http.HandlerFunc {
 		
 		if r.Method != http.MethodPost {
 			http.Error(w, "only POST method allowed", http.StatusMethodNotAllowed)
-			return
-		}
+			return}
 
 		var bom BOM
 		if err := json.NewDecoder(r.Body).Decode(&bom); err != nil {
 			http.Error(w, "invalid JSON", http.StatusBadRequest)
-			return
-		}
+			return}
 
 		if bom.Child_id == nil || bom.Child_quantity == nil {
 			http.Error(w, "child_id and child_quantity are required", http.StatusBadRequest)
-			return
-		}
+			return}
 
 		id, err := bom.InsertBOM(db)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Failed to insert BOM: %v", err), http.StatusInternalServerError)
-			return
-		}
+			return}
 
 		w.WriteHeader(http.StatusCreated)
 		fmt.Fprintf(w, "BOM entry inserted with last inserted row ID: %d", id)
 	}
 }
 
-/*
-func GetProductIdHandler(db *sql.DB) http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request){
+func GetBomHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var bom BOM
+		w.Header().Set("Content-Type", "application/json")
 
-		var product Product
-
-		if r.Method!=http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
-			return}
-		
-		if json.NewDecoder(r.Body).Decode(&product)!=nil{
-			http.Error(w,"invalid JSON",http.StatusBadRequest)
-			return
-		}
-
-		if product.Name==nil&&product.Id==nil{
-			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
+		if r.Method != http.MethodGet {
+			http.Error(w, "only GET method allowed", http.StatusMethodNotAllowed)
 			return}
 
-		id,err:=product.GetProductId(db)
-		if err!=nil{http.Error(w,fmt.Sprintf("Cant get id: %v",err),http.StatusInternalServerError);return}
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w,"Id: ",id)
+		if json.NewDecoder(r.Body).Decode(&bom) != nil {
+			http.Error(w, "invalid JSON", http.StatusBadRequest)
+			return}
+
+		if bom.Child_id == nil {
+			http.Error(w, "child_id is required", http.StatusBadRequest)
+			return}
+
+		err := bom.GetBom(db, *bom.Child_id)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to retrieve BOM: %v", err), http.StatusInternalServerError)
+			return}
+
+		if json.NewEncoder(w).Encode(bom) != nil {
+			http.Error(w, "failed to encode JSON", http.StatusInternalServerError)
+			return}
 	}
 }
 
-func DeleteProductHandler(db *sql.DB) http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request){
+func DeleteBomHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var bom BOM
+		w.Header().Set("Content-Type", "application/json")
 
-		var product Product
-		
-		if r.Method != http.MethodDelete{http.Error(w,"only post method allowed",http.StatusMethodNotAllowed)
+		if r.Method != http.MethodDelete {
+			http.Error(w, "only DELETE method allowed", http.StatusMethodNotAllowed)
 			return}
 
-		if json.NewDecoder(r.Body).Decode(&product)!=nil{
-			http.Error(w,"invalid JSON",http.StatusBadRequest)
+		if json.NewDecoder(r.Body).Decode(&bom) != nil {
+			http.Error(w, "invalid JSON", http.StatusBadRequest)
 			return}
 
-		if product.Name==nil&&product.Id==nil{
-			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
+		if bom.Child_id == nil {
+			http.Error(w, "child_id is required", http.StatusBadRequest)
 			return}
 
-		id,err:=product.DeleteProduct(db)
-		if err!=nil{http.Error(w,fmt.Sprintf("Cant delete product :%v",err),http.StatusInternalServerError)
-			return}
-		
-		w.WriteHeader(http.StatusNoContent)
-		fmt.Fprint(w,fmt.Sprintf("Product with id: %d was deleted",id))
-	}
-}
-
-func GetProductHandler(db *sql.DB) http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request){
-	
-		var product Product
-		w.Header().Set("Content-Type","application/json")
-		
-		if r.Method != http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
-			return}
-
-		if json.NewDecoder(r.Body).Decode(&product)!=nil{
-			http.Error(w,"invalid JSON",http.StatusBadRequest)
-			return}
-
-		if product.Name==nil&&product.Id==nil{
-			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
-			return}
-
-		err:=product.GetProduct(db)
-		if err!=nil{http.Error(w,fmt.Sprintf("cant find product: %v",err),
-			http.StatusInternalServerError)
-		return}
-
-		if json.NewEncoder(w).Encode(product)!=nil{http.Error(w,"failed to encode json ",http.StatusInternalServerError)
-		return}
-	}
-}
-
-func UpdateProductHandler(db *sql.DB) http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request){
-	
-		var newProduct Product
-		w.Header().Set("Content-Type","application/json")
-		
-		if r.Method != http.MethodPatch{http.Error(w,"only patch method allowed",http.StatusMethodNotAllowed)
-			return}
-
-		if json.NewDecoder(r.Body).Decode(&newProduct)!=nil{
-			http.Error(w,"invalid JSON",http.StatusBadRequest)
-			return}
-
-		if newProduct.Name==nil&&newProduct.Id==nil{
-			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
-			return}
-
-		prodId,err:=newProduct.UpdateProduct(db)
-		if err!=nil{http.Error(w,fmt.Sprintf("cant update product %v",err),http.StatusInternalServerError)
+		err := bom.DeleteBom(db, *bom.Child_id)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to delete BOM entries: %v", err), http.StatusInternalServerError)
 			return}
 
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w,fmt.Sprintf("product with id %d updated",prodId))
+		fmt.Fprint(w, "BOM entries deleted successfully")
 	}
 }
-*/
+
+func UpdateBomHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var bom BOM
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.Method != http.MethodPut {
+			http.Error(w, "only PUT method allowed", http.StatusMethodNotAllowed)
+			return}
+
+		if json.NewDecoder(r.Body).Decode(&bom) != nil {
+			http.Error(w, "invalid JSON", http.StatusBadRequest)
+			return}
+
+		if bom.Child_id == nil {
+			http.Error(w, "child_id is required", http.StatusBadRequest)
+			return}
+
+		err := bom.DeleteBom(db, *bom.Child_id)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to delete BOM entries: %v", err), http.StatusInternalServerError)
+			return}
+
+		_, err = bom.InsertBOM(db)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to insert BOM entries: %v", err), http.StatusInternalServerError)
+			return}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, "BOM entries updated successfully")
+	}
+}

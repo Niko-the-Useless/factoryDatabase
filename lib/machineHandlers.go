@@ -40,6 +40,32 @@ func InsertMachineHandler(db *sql.DB) http.HandlerFunc {
 		fmt.Fprint(w,fmt.Sprintf("Machine inserted with id: %d",id))
 	}
 }
+func GetMachineHandler(db *sql.DB) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request){
+	
+		var machine Machine
+		w.Header().Set("Content-Type","application/json")
+		
+		if r.Method != http.MethodGet{http.Error(w,"only get method allowed",http.StatusMethodNotAllowed)
+			return}
+
+		if json.NewDecoder(r.Body).Decode(&machine)!=nil{
+			http.Error(w,"invalid JSON",http.StatusBadRequest)
+			return}
+
+		if machine.Name==nil&&machine.Id==nil{
+			http.Error(w,"provide Name or Id ",http.StatusBadRequest)
+			return}
+
+		err:=machine.GetMachine(db)
+		if err!=nil{http.Error(w,fmt.Sprintf("cant find machine: %v",err),
+			http.StatusInternalServerError)
+		return}
+
+		if json.NewEncoder(w).Encode(machine)!=nil{http.Error(w,"failed to encode json ",http.StatusInternalServerError)
+		return}
+	}
+}
 func GetMachineIdHandler(db *sql.DB) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 

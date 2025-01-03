@@ -76,16 +76,81 @@ func (b *BOM) InsertBOM(db *sql.DB) (int64, error) {
 			nullOrValue(byproductID),
 			nullOrValue(byproductQuantity),
 		)
+		if err != nil {return 0, fmt.Errorf("failed to insert BOM: %v", err)}
+	}
+
+	if result != nil {return result.LastInsertId()}
+	return 0, nil
+}
+
+func (b *BOM) GetBom(db *sql.DB, childID int64) error {
+	sqlQuery := `SELECT 
+				parent_id, 
+				parent_quantity, 
+				child_id, 
+				child_quantity, 
+				byproduct_id, 
+				byproduct_quantity 
+			FROM bom 
+			WHERE child_id = ?`
+
+	var parentIDs []int64
+	var parentQuantities []int64
+	var byproductIDs []int64
+	var byproductQuantities []int64
+
+	rows, err := db.Query(sqlQuery, childID)
+	if err != nil {
+		return fmt.Errorf("failed to query bom table: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var parentID, parentQuantity, byproductID, byproductQuantity sql.NullInt64
+		var childIDValue, childQuantityValue int64
+
+		err := rows.Scan(&parentID, &parentQuantity, &childIDValue, &childQuantityValue, &byproductID, &byproductQuantity)
 		if err != nil {
-			return 0, fmt.Errorf("failed to insert BOM: %v", err)
+			return fmt.Errorf("failed to scan row: %v", err)
+		}
+
+		if parentID.Valid {
+			parentIDs = append(parentIDs, parentID.Int64)
+		}
+		if parentQuantity.Valid {
+			parentQuantities = append(parentQuantities, parentQuantity.Int64)
+		}
+
+		b.Child_id = &childIDValue
+		b.Child_quantity = &childQuantityValue
+
+		if byproductID.Valid {
+			byproductIDs = append(byproductIDs, byproductID.Int64)
+		}
+		if byproductQuantity.Valid {
+			byproductQuantities = append(byproductQuantities, byproductQuantity.Int64)
 		}
 	}
 
-	if result != nil {
-		return result.LastInsertId()
-	}
-	return 0, nil
+	b.Parent_id = &parentIDs
+	b.Parent_quantity = &parentQuantities
+	b.Byproduct_id = &byproductIDs
+	b.Byproduct_quantity = &byproductQuantities
+
+	if err := rows.Err(); err != nil {return fmt.Errorf("row iteration error: %v", err)}
+	return nil
 }
+
+func (b *BOM) DeleteBom(db *sql.DB, childID int64) error {
+	sql := `DELETE FROM bom WHERE child_id = ?`
+
+	_, err := db.Exec(sql, childID)
+	if err != nil {
+		return fmt.Errorf("failed to delete BOM entries with child_id %d: %v", childID, err)}
+
+	return nil
+}
+
 
 func nullOrValue(ptr *int64) interface{} {
 	if ptr == nil {
@@ -93,4 +158,3 @@ func nullOrValue(ptr *int64) interface{} {
 	}
 	return *ptr
 }
-
